@@ -1,0 +1,23 @@
+.hour-block {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  border: black 1px solid;
+}
+
+.hour-title {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  border: white 1px solid;
+}
+
+.enabled {
+  background: blue;
+}
+
+.day-title {
+  display: inline-block;
+  width:75px;
+}
