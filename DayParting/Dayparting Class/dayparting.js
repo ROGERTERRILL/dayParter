@@ -225,7 +225,7 @@ class dayParting {
       4: 'thursday',
       5: 'friday',
       6: 'saturday',
-      'blank': ' ',
+      blank: ' ',
     };
 
     const dayTitle = document.createElement('div');
@@ -235,14 +235,12 @@ class dayParting {
     return dayTitle;
   }
 
-  
   handler() {
     let isMouseDown = false;
-    document.querySelectorAll('.hour-block').forEach((node) =>{
-      
+    document.querySelectorAll('.hour-block').forEach((node) => {
       node.addEventListener('mousedown', (e) => {
         isMouseDown = true;
-        
+
         const hourOfSingleDay = e.target.getAttribute('data-hour');
         console.log(hourOfSingleDay);
         e.target.classList.toggle('enabled');
@@ -253,20 +251,30 @@ class dayParting {
         const day = arrayLocationOfHour[0];
         const hour = arrayLocationOfHour[1];
 
-        this.dayPartingState.payload.schedule[day][hour] = !this.dayPartingState.payload.schedule[day][hour];
-    
+        this.dayPartingState.payload.schedule[day][hour] = !this.dayPartingState
+          .payload.schedule[day][hour];
       });
 
-      node.addEventListener('mouseover', e=> {
-        if(isMouseDown){
+      node.addEventListener('mouseover', (e) => {
+        if (isMouseDown) {
           console.log(e.target.getAttribute('data-hour'));
-        }
-      })
+          const hourOfSingleDay = e.target.getAttribute('data-hour');
+          console.log(hourOfSingleDay);
+          e.target.classList.toggle('enabled');
 
-      node.addEventListener('mouseup', e => {
-        isMouseDown = false;
-        // console.log(e.target.getAttribute('data-hour'));
-      })
+          const arrayLocationOfHour = hourOfSingleDay.split('-').map(Number);
+          console.log(arrayLocationOfHour);
+
+          const day = arrayLocationOfHour[0];
+          const hour = arrayLocationOfHour[1];
+
+          this.dayPartingState.payload.schedule[day][hour] = !this
+            .dayPartingState.payload.schedule[day][hour];
+        }
+      });
+    });
+    document.addEventListener('mouseup', (e) => {
+      console.log('MouseUp');
     });
   }
 
