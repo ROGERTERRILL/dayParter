@@ -2,7 +2,7 @@ class dayParting {
   constructor(params) {
     const defaultState = {
       payload: {
-        campaign_id: [1234],
+        campaign_ids: [1234],
         // 2D array for each day
         schedule: [
           [
@@ -211,11 +211,6 @@ class dayParting {
     return div;
   }
 
-  addBreak() {
-    const br = document.createElement('br');
-    return br;
-  }
-
   addDay(dayNumber) {
     const day = {
       0: 'sunday',
@@ -274,7 +269,8 @@ class dayParting {
       });
     });
     document.addEventListener('mouseup', (e) => {
-      console.log('MouseUp');
+      // console.log('MouseUp');
+      isMouseDown = false;
     });
   }
 
@@ -291,7 +287,7 @@ class dayParting {
     for (let i = 0; i < schedules[0].length; i++) {
       el.appendChild(this.columnHeader(i));
     }
-    el.appendChild(this.addBreak());
+    el.appendChild(document.createElement('br'));
 
     // Add row title and hour blocks
     for (let i = 0; i < schedules.length; i++) {
@@ -299,7 +295,7 @@ class dayParting {
       for (let j = 0; j < schedules[i].length; j++) {
         el.appendChild(this.createHourBlock(schedules[i][j], `${i}-${j}`));
       }
-      el.appendChild(this.addBreak());
+      el.appendChild(document.createElement('br'));
     }
   }
 
