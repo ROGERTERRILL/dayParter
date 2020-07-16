@@ -193,7 +193,7 @@ class dayParting {
 
     this.dayPartingState = { ...defaultState, ...params };
     this.render();
-    this.handler();
+    // this.handler();
   }
 
   createHourBlock(status, hour) {
@@ -209,6 +209,18 @@ class dayParting {
     div.classList.add('hour-title');
     div.textContent = hour;
     return div;
+  }
+
+  generateTableHead(table, hourTitle) {
+    let thead = table.createTHead();
+    let row = thead.insertRow();
+    row.appendChild(document.createElement('th'));
+    for (let hour of hourTitle) {
+      let th = document.createElement('th');
+      let title = document.createTextNode(hour);
+      th.appendChild(title); // Creates the th
+      row.appendChild(th); // Adds th to the row
+    }
   }
 
   addDay(dayNumber) {
@@ -278,25 +290,31 @@ class dayParting {
     document.getElementById('dayParting').innerHTML = `<div>Now</div>`;
   }
 
+  // render() {
+  //   const el = document.getElementById('dayParting');
+  //   const schedules = this.dayPartingState.payload.schedule;
+
+  //   // Add column headers
+  //   el.appendChild(this.addDay('blank'));
+  //   for (let i = 0; i < schedules[0].length; i++) {
+  //     el.appendChild(this.columnHeader(i));
+  //   }
+  //   el.appendChild(document.createElement('br'));
+
+  //   // Add row title and hour blocks
+  //   for (let i = 0; i < schedules.length; i++) {
+  //     el.appendChild(this.addDay(i));
+  //     for (let j = 0; j < schedules[i].length; j++) {
+  //       el.appendChild(this.createHourBlock(schedules[i][j], `${i}-${j}`));
+  //     }
+  //     el.appendChild(document.createElement('br'));
+  //   }
+  // }
+
   render() {
-    const el = document.getElementById('dayParting');
-    const schedules = this.dayPartingState.payload.schedule;
-
-    // Add column headers
-    el.appendChild(this.addDay('blank'));
-    for (let i = 0; i < schedules[0].length; i++) {
-      el.appendChild(this.columnHeader(i));
-    }
-    el.appendChild(document.createElement('br'));
-
-    // Add row title and hour blocks
-    for (let i = 0; i < schedules.length; i++) {
-      el.appendChild(this.addDay(i));
-      for (let j = 0; j < schedules[i].length; j++) {
-        el.appendChild(this.createHourBlock(schedules[i][j], `${i}-${j}`));
-      }
-      el.appendChild(document.createElement('br'));
-    }
+    const table = document.getElementById('dayParting');
+    const hourHeader = Object.keys(this.dayPartingState.payload.schedule[0]);
+    this.generateTableHead(table, hourHeader);
   }
 
   // HELPERS
