@@ -1,6 +1,7 @@
 #dayParting {
   border-collapse: collapse;
   border-spacing: 0px;
+  user-select: none;
 }
 
 .hour-block {
@@ -26,4 +27,8 @@
 .day-title {
   display: inline-block;
   width:75px;
+}
+
+.preview {
+  background: gray;
 }
