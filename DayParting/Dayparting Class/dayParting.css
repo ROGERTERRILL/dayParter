@@ -1,9 +1,15 @@
+#dayParting {
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+
 .hour-block {
-  display: inline-block;
   height: 30px;
   width: 30px;
   border: black 1px solid;
+  border-collapse: collapse;
 }
+
 
 .hour-title {
   display: inline-block;
