@@ -193,22 +193,44 @@ class dayParting {
 
     this.dayPartingState = { ...defaultState, ...params };
     this.render();
-    this.handler();
+    this.addHandlers();
   }
 
-  createHourBlock(status, hour) {
-    const div = document.createElement('div');
-    div.setAttribute('data-hour', hour);
-    div.classList.add('hour-block');
-    status ? div.classList.add('enabled') : '';
-    return div;
+  generateTableHead(table, hourTitle) {
+    let thead = table.createTHead();
+    let row = thead.insertRow();
+    row.appendChild(document.createElement('th'));
+    for (let hour of hourTitle) {
+      let th = document.createElement('th');
+      let title = document.createTextNode(hour);
+      th.appendChild(title); // Creates the th
+      row.appendChild(th); // Adds th to the row
+    }
   }
 
-  columnHeader(hour) {
-    const div = document.createElement('div');
-    div.classList.add('hour-title');
-    div.textContent = hour;
-    return div;
+  generateTable(table, days, hours) {
+    for (let i = 0; i < days.length; i++) {
+      let row = table.insertRow();
+      let dayTitle = row.insertCell();
+      let text = document.createTextNode(this.addDay(days[i]));
+      dayTitle.appendChild(text);
+      for (let j = 0; j < hours.length; j++) {
+        let cell = row.insertCell();
+        cell.classList.add('hour-block');
+        if (this.dayPartingState.payload.schedule[i][j]) {
+          cell.classList.add('enabled');
+        }
+      }
+    }
+  }
+
+  getCellIndex(rowsArray) {
+    const rowIndex = rowsArray.findIndex((row) => row.contains(event.target));
+    const columns = Array.from(
+      rowsArray[rowIndex].querySelectorAll('td.hour-block')
+    );
+    const columnIndex = columns.findIndex((column) => column == event.target);
+    return [rowIndex - 1, columnIndex];
   }
 
   addDay(dayNumber) {
@@ -223,80 +245,93 @@ class dayParting {
       blank: ' ',
     };
 
-    const dayTitle = document.createElement('div');
-    dayTitle.classList.add('day-title');
-    dayTitle.textContent = day[dayNumber] || 'day does not exist';
-
-    return dayTitle;
+    return day[dayNumber] || 'day does not exist';
   }
 
-  handler() {
+  toggleBlockofHours(start, end) {
+    const table = document.getElementById('dayParting');
+    console.log(start, end);
+
+    if (start[0] > end[0]) {
+      [start[0], end[0]] = [end[0], start[0]];
+    }
+
+    if (start[1] > end[1]) {
+      [start[1], end[1]] = [end[1], start[1]];
+    }
+
+    let height = start[0] + (end[0] - start[0]);
+    let width = start[1] + (end[1] - start[1]);
+    console.log(height, width);
+
+    for (let i = start[0]; i <= height; i++) {
+      for (let j = start[1]; j <= width; j++) {
+        this.dayPartingState.payload.schedule[i][j] = !this.dayPartingState.payload.schedule[i][j];
+        table.rows[i + 1].cells[j + 1].classList.add('enabled');
+      }
+    }
+  }
+
+  addHandlers() {
     let isMouseDown = false;
-    document.querySelectorAll('.hour-block').forEach((node) => {
-      node.addEventListener('mousedown', (e) => {
+    let start, end;
+
+    // Get each row
+    const rows = document.querySelectorAll('#dayParting tr');
+
+    // Create an array of each row instance
+    const rowsArray = Array.from(rows);
+
+    // Get each hour block and for each hour, add click event listener
+    document.querySelectorAll('td.hour-block').forEach((hour) => {
+      hour.addEventListener('mousedown', (event) => {
         isMouseDown = true;
-
-        const hourOfSingleDay = e.target.getAttribute('data-hour');
-        console.log(hourOfSingleDay);
-        e.target.classList.toggle('enabled');
-
-        const arrayLocationOfHour = hourOfSingleDay.split('-').map(Number);
-        console.log(arrayLocationOfHour);
-
-        const day = arrayLocationOfHour[0];
-        const hour = arrayLocationOfHour[1];
-
+        event.target.classList.toggle('enabled');
+        let cellIndex = this.getCellIndex(rowsArray);
+        start = cellIndex;
+        console.log(cellIndex);
+        let [day, hour] = cellIndex;
         this.dayPartingState.payload.schedule[day][hour] = !this.dayPartingState
           .payload.schedule[day][hour];
       });
-
-      node.addEventListener('mouseover', (e) => {
+      hour.addEventListener('mouseover', (event) => {
         if (isMouseDown) {
-          console.log(e.target.getAttribute('data-hour'));
-          const hourOfSingleDay = e.target.getAttribute('data-hour');
-          console.log(hourOfSingleDay);
-          e.target.classList.toggle('enabled');
-
-          const arrayLocationOfHour = hourOfSingleDay.split('-').map(Number);
-          console.log(arrayLocationOfHour);
-
-          const day = arrayLocationOfHour[0];
-          const hour = arrayLocationOfHour[1];
-
+          event.target.classList.toggle('enabled');
+          let cellIndex = this.getCellIndex(rowsArray);
+          let [day, hour] = cellIndex;
           this.dayPartingState.payload.schedule[day][hour] = !this
             .dayPartingState.payload.schedule[day][hour];
         }
       });
+      hour.addEventListener('mouseup', (event) => {
+        let cellIndex = this.getCellIndex(rowsArray);
+        console.log(cellIndex);
+        end = cellIndex;
+        this.toggleBlockofHours(start, end);
+      });
     });
     document.addEventListener('mouseup', (e) => {
-      // console.log('MouseUp');
       isMouseDown = false;
     });
   }
 
-  update() {
-    document.getElementById('dayParting').innerHTML = `<div>Now</div>`;
+  clearTable() {
+    const table = document.getElementById('dayParting');
+    for (let i = 0; i < 7; i++) {
+      for (let j = 0; j < 24; j++) {
+        this.dayPartingState.payload.schedule[i][j] = false;
+        table.rows[i+1].cells[j+1].classList.remove('enabled');
+      }
+    }
   }
 
   render() {
-    const el = document.getElementById('dayParting');
-    const schedules = this.dayPartingState.payload.schedule;
+    const table = document.getElementById('dayParting');
 
-    // Add column headers
-    el.appendChild(this.addDay('blank'));
-    for (let i = 0; i < schedules[0].length; i++) {
-      el.appendChild(this.columnHeader(i));
-    }
-    el.appendChild(document.createElement('br'));
-
-    // Add row title and hour blocks
-    for (let i = 0; i < schedules.length; i++) {
-      el.appendChild(this.addDay(i));
-      for (let j = 0; j < schedules[i].length; j++) {
-        el.appendChild(this.createHourBlock(schedules[i][j], `${i}-${j}`));
-      }
-      el.appendChild(document.createElement('br'));
-    }
+    const hourTitle = Object.keys(this.dayPartingState.payload.schedule[0]);
+    const dayTitle = Object.keys(this.dayPartingState.payload.schedule);
+    this.generateTable(table, dayTitle, hourTitle);
+    this.generateTableHead(table, hourTitle);
   }
 
   // HELPERS
