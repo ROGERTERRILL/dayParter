@@ -311,8 +311,8 @@ class dayParting {
         let cellIndex = this.getCellIndex(rowsArray);
         start = cellIndex;
         let [day, hour] = cellIndex;
-        this.dayPartingState.payload.schedule[day][hour] = !this.dayPartingState
-          .payload.schedule[day][hour];
+        // this.dayPartingState.payload.schedule[day][hour] = !this.dayPartingState
+        //   .payload.schedule[day][hour];
       });
       hour.addEventListener('mouseover', (event) => {
         if (isMouseDown) {
@@ -336,6 +336,7 @@ class dayParting {
     document.addEventListener('mouseup', (e) => {
       isMouseDown = false;
       this.previewClearTable();
+      this.showSchedule();
     });
   }
 
@@ -371,6 +372,10 @@ class dayParting {
   // HELPERS
   showObject() {
     console.log(this.dayPartingState.payload);
+  }
+
+  showSchedule() {
+    console.log(this.dayPartingState.payload.schedule);
   }
 
   changeFirstElement() {
