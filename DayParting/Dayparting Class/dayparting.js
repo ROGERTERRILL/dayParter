@@ -250,7 +250,6 @@ class dayParting {
 
   toggleBlockofHours(start, end) {
     const table = document.getElementById('dayParting');
-    console.log(start, end);
 
     if (start[0] > end[0]) {
       [start[0], end[0]] = [end[0], start[0]];
@@ -262,12 +261,34 @@ class dayParting {
 
     let height = start[0] + (end[0] - start[0]);
     let width = start[1] + (end[1] - start[1]);
-    console.log(height, width);
 
     for (let i = start[0]; i <= height; i++) {
       for (let j = start[1]; j <= width; j++) {
-        this.dayPartingState.payload.schedule[i][j] = !this.dayPartingState.payload.schedule[i][j];
-        table.rows[i + 1].cells[j + 1].classList.add('enabled');
+        this.dayPartingState.payload.schedule[i][j] = !this.dayPartingState
+          .payload.schedule[i][j];
+        table.rows[i + 1].cells[j + 1].classList.toggle('enabled');
+        table.rows[i + 1].cells[j + 1].classList.remove('preview');
+      }
+    }
+  }
+
+  togglePreviewBlockofHours(start, end) {
+    const table = document.getElementById('dayParting');
+
+    if (start[0] > end[0]) {
+      [start[0], end[0]] = [end[0], start[0]];
+    }
+
+    if (start[1] > end[1]) {
+      [start[1], end[1]] = [end[1], start[1]];
+    }
+
+    let height = start[0] + (end[0] - start[0]);
+    let width = start[1] + (end[1] - start[1]);
+
+    for (let i = start[0]; i <= height; i++) {
+      for (let j = start[1]; j <= width; j++) {
+        table.rows[i + 1].cells[j + 1].classList.add('preview');
       }
     }
   }
@@ -286,32 +307,35 @@ class dayParting {
     document.querySelectorAll('td.hour-block').forEach((hour) => {
       hour.addEventListener('mousedown', (event) => {
         isMouseDown = true;
-        event.target.classList.toggle('enabled');
+        event.target.classList.toggle('preview');
         let cellIndex = this.getCellIndex(rowsArray);
         start = cellIndex;
-        console.log(cellIndex);
         let [day, hour] = cellIndex;
         this.dayPartingState.payload.schedule[day][hour] = !this.dayPartingState
           .payload.schedule[day][hour];
       });
       hour.addEventListener('mouseover', (event) => {
         if (isMouseDown) {
-          event.target.classList.toggle('enabled');
           let cellIndex = this.getCellIndex(rowsArray);
-          let [day, hour] = cellIndex;
-          this.dayPartingState.payload.schedule[day][hour] = !this
-            .dayPartingState.payload.schedule[day][hour];
+          end = cellIndex;
+          this.previewClearTable();
+          this.togglePreviewBlockofHours(start, end);
+          // event.target.classList.toggle('preview');
+          // let cellIndex = this.getCellIndex(rowsArray);
+          // let [day, hour] = cellIndex;
+          // this.dayPartingState.payload.schedule[day][hour] = !this
+          //   .dayPartingState.payload.schedule[day][hour];
         }
       });
       hour.addEventListener('mouseup', (event) => {
         let cellIndex = this.getCellIndex(rowsArray);
-        console.log(cellIndex);
         end = cellIndex;
         this.toggleBlockofHours(start, end);
       });
     });
     document.addEventListener('mouseup', (e) => {
       isMouseDown = false;
+      this.previewClearTable();
     });
   }
 
@@ -320,7 +344,17 @@ class dayParting {
     for (let i = 0; i < 7; i++) {
       for (let j = 0; j < 24; j++) {
         this.dayPartingState.payload.schedule[i][j] = false;
-        table.rows[i+1].cells[j+1].classList.remove('enabled');
+        table.rows[i + 1].cells[j + 1].classList.remove('enabled');
+        table.rows[i + 1].cells[j + 1].classList.remove('preview');
+      }
+    }
+  }
+
+  previewClearTable() {
+    const table = document.getElementById('dayParting');
+    for (let i = 0; i < 7; i++) {
+      for (let j = 0; j < 24; j++) {
+        table.rows[i + 1].cells[j + 1].classList.remove('preview');
       }
     }
   }
