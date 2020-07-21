@@ -266,7 +266,7 @@ class dayParting {
 
     for (let i = start[0]; i <= height; i++) {
       for (let j = start[1]; j <= width; j++) {
-        this.dayPartingState.payload.schedule[i][j] = true;
+        this.dayPartingState.payload.schedule[i][j] = !this.dayPartingState.payload.schedule[i][j];
         table.rows[i + 1].cells[j + 1].classList.add('enabled');
       }
     }
@@ -315,8 +315,14 @@ class dayParting {
     });
   }
 
-  updateTable() {
-    const schedule = this.dayPartingState.payload.schedule;
+  clearTable() {
+    const table = document.getElementById('dayParting');
+    for (let i = 0; i < 7; i++) {
+      for (let j = 0; j < 24; j++) {
+        this.dayPartingState.payload.schedule[i][j] = false;
+        table.rows[i+1].cells[j+1].classList.remove('enabled');
+      }
+    }
   }
 
   render() {
